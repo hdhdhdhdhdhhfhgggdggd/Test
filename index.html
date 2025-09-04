@@ -1,1 +1,28 @@
-
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Біблійна Вікторина</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <h1>Біблійна Вікторина</h1>
+        <p>Оберіть рівень складності:</p>
+        <div class="levels">
+            <button id="easy">Легкий</button>
+            <button id="medium">Середній</button>
+            <button id="expert">Експерт</button>
+        </div>
+        <div id="quiz" class="quiz hidden">
+            <div id="question"></div>
+            <div id="options"></div>
+            <button id="next">Далі</button>
+        </div>
+        <div id="result" class="hidden"></div>
+    </div>
+    <script src="vopros.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>
