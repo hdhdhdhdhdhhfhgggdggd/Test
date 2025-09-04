@@ -113,6 +113,572 @@
             background: linear-gradient(90deg, #00cc00, #66ff66);
             height: 100%;
             width: 0;
+            transition: width 0.6s ease-in-out;
+        }
+
+        #timer {
+            font-size: 1.6em;
+            color: #ffcc00;
+            margin-bottom: 20px;
+            animation: pulse 1.2s infinite alternate;
+        }
+
+        @keyframes pulse {
+            from { transform: scale(1); }
+            to { transform: scale(1.07); }
+        }
+
+        #question {
+            font-size: 1.4em;
+            margin-bottom: 25px;
+            color: #ffffff;
+            line-height: 1.4;
+        }
+
+        .option {
+            background: rgba(80, 80, 80, 0.35);
+            border-radius: 12px;
+            padding: 18px;
+            margin: 12px 0;
+            color: #e0e0e0;
+            cursor: pointer;
+            transition: all 0.4s ease;
+            position: relative;
+            overflow: hidden;
+            font-size: 1.1em;
+        }
+
+        .option:hover {
+            background: rgba(100, 100, 100, 0.45);
+            transform: scale(1.03);
+        }
+
+        .option.correct {
+            background: rgba(0, 200, 0, 0.35);
+            border: 2px solid #00cc00;
+            animation: glowCorrect 1.2s ease;
+        }
+
+        .option.incorrect {
+            background: rgba(200, 0, 0, 0.35);
+            border: 2px solid #cc0000;
+            animation: glowIncorrect 1.2s ease, shake 0.6s;
+        }
+
+        @keyframes glowCorrect {
+            0% { box-shadow: 0 0 12px rgba(0, 200, 0, 0.6); }
+            50% { box-shadow: 0 0 25px rgba(0, 200, 0, 0.9); }
+            100% { box-shadow: 0 0 12px rgba(0, 200, 0, 0.6); }
+        }
+
+        @keyframes glowIncorrect {
+            0% { box-shadow: 0 0 12px rgba(200, 0, 0, 0.6); }
+            50% { box-shadow: 0 0 25px rgba(200, 0, 0, 0.9); }
+            100% { box-shadow: 0 0 12px rgba(200, 0, 0, 0.6); }
+        }
+
+        @keyframes shake {
+            0% { transform: translateX(0); }
+            25% { transform: translateX(-6px); }
+            50% { transform: translateX(6px); }
+            75% { transform: translateX(-6px); }
+            100% { transform: translateX(0); }
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        #result {
+            color: #ffffff;
+            font-size: 2em;
+            margin-top: 25px;
+            animation: fadeIn 1.2s ease-in-out;
+        }
+
+        #result-text {
+            margin-bottom: 20px;
+        }
+
+        #restart {
+            margin-top: 20px;
+        }
+
+        /* Mobile adaptation */
+        @media (max-width: 600px) {
+            .container {
+                padding: 20px;
+                max-width: 98%;
+            }
+
+            h1 {
+                font-size: 2.2em;
+            }
+
+            p {
+                font-size: 1.1em;
+            }
+
+            button {
+                padding: 12px 25px;
+                font-size: 1em;
+            }
+
+            .quiz {
+                padding: 20px;
+            }
+
+            #question {
+                font-size: 1.2em;
+            }
+
+            .option {
+                padding: 14px;
+                font-size: 0.95em;
+            }
+
+            #timer {
+                font-size: 1.4em;
+            }
+
+            .levels {
+                flex-direction: column;
+            }
+
+            .levels button {
+                margin-bottom: 15px;
+            }
+
+            #result {
+                font-size: 1.6em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Біблійна Вікторина</h1>
+        <p>Оберіть рівень складності:</p>
+        <div class="levels">
+            <button id="easy">Легкий</button>
+            <button id="medium">Середній</button>
+            <button id="expert">Експерт</button>
+        </div>
+        <div id="quiz" class="quiz hidden">
+            <div class="progress">
+                <div id="progress-bar"></div>
+            </div>
+            <div id="timer">30</div>
+            <div id="question"></div>
+            <div id="options"></div>
+            <button id="next" class="hidden">Далі</button>
+        </div>
+        <div id="result" class="hidden">
+            <p id="result-text"></p>
+            <button id="restart">Почати заново</button>
+        </div>
+    </div>
+    <script>
+        const questions = {
+            easy: [
+                { question: "Яка перша книга Біблії?", answer: "Буття", options: ["Буття", "Вихід", "Матвія", "Об'явлення"] },
+                { question: "Скільки днів Бог творив світ?", answer: "6", options: ["7", "6", "5", "40"] },
+                { question: "Хто був першою людиною?", answer: "Адам", options: ["Ной", "Адам", "Авраам", "Мойсей"] },
+                { question: "Хто була першою жінкою?", answer: "Єва", options: ["Сара", "Єва", "Марія", "Рут"] },
+                { question: "Де жили Адам і Єва на початку світу?", answer: "Едемський сад", options: ["Едемський сад", "Вифлеєм", "Єрусалим", "Єгипет"] },
+                { question: "Як звали трьох синів Адама і Єви, згаданих у Біблії?", answer: "Каїн, Авель, Сет", options: ["Каїн, Авель, Сет", "Сим, Хам, Яфет", "Петро, Яків, Іван", "Саул, Давид, Соломон"] },
+                { question: "Кому Бог наказав побудувати ковчег?", answer: "Ной", options: ["Мойсей", "Ной", "Авраам", "Давид"] },
+                { question: "Скільки днів і ночей йшов дощ, коли Ной був у ковчезі?", answer: "40", options: ["7", "40", "150", "3"] },
+                { question: "Який знак дав Бог Ною, що більше не знищить землю водою?", answer: "Веселка", options: ["Веселка", "Голуб", "Вогонь", "Зірки"] },
+                { question: "Скільки братів мав Йосип?", answer: "11", options: ["12", "11", "10", "7"] },
+                { question: "Що Яків дав Йосипу, що викликало заздрість у його братів?", answer: "Кольоровий плащ", options: ["Кольоровий плащ", "Меч", "Золото", "Трон"] },
+                { question: "Як мати Мойсея врятувала його від єгипетських воїнів?", answer: "Поклала його в кошик у річці", options: ["Сховала в печері", "Поклала його в кошик у річці", "Відправила в Ханаан", "Віддала фараону"] },
+                { question: "Через що Бог говорив до Мойсея в пустелі?", answer: "Палаючий кущ", options: ["Палаючий кущ", "Хмара", "Ангел", "Грім"] },
+                { question: "Скільки кар Бог послав на Єгипет?", answer: "10", options: ["7", "10", "12", "40"] },
+                { question: "Яка була остання кара, що переконала фараона відпустити рабів?", answer: "Смерть первістків у єгипетських родинах", options: ["Сарана", "Темрява", "Смерть первістків у єгипетських родинах", "Град"] },
+                { question: "Де Бог дав Мойсею Десять Заповідей?", answer: "Гора Сінай", options: ["Гора Сінай", "Гора Хорив", "Єрусалим", "Єгипет"] },
+                { question: "Який золотий образ зробили ізраїльтяни біля гори Сінай?", answer: "Золоте теля", options: ["Золоте теля", "Золотий орел", "Золота змія", "Золотий ідол"] },
+                { question: "Хто був першим царем Ізраїлю?", answer: "Саул", options: ["Давид", "Саул", "Соломон", "Самуїл"] },
+                { question: "Куди кинули Даниїла, коли він молився до Бога, хоча це було заборонено?", answer: "Лев’яча яма", options: ["Лев’яча яма", "Піч", "В’язниця", "Вигнання"] },
+                { question: "Хто була земною матір’ю Ісуса?", answer: "Марія", options: ["Марфа", "Марія", "Єлизавета", "Сара"] },
+                { question: "Хто був прийомним батьком Ісуса на землі?", answer: "Йосип", options: ["Йосип", "Іван", "Петро", "Яків"] },
+                { question: "Назвіть місто, де народився Ісус.", answer: "Вифлеєм", options: ["Назарет", "Вифлеєм", "Єрусалим", "Галілея"] },
+                { question: "Хто охрестив Ісуса?", answer: "Іван Хреститель", options: ["Петро", "Іван Хреститель", "Павло", "Матвій"] },
+                { question: "Якою була професія Ісуса перед початком Його проповідей?", answer: "Тесляр", options: ["Рибалка", "Тесляр", "Вчитель", "Пастух"] },
+                { question: "Назвіть рідне місто Ісуса.", answer: "Назарет", options: ["Вифлеєм", "Назарет", "Єрусалим", "Капернаум"] },
+                { question: "Назвіть місце, де Ісус ходив по воді.", answer: "Галілейське море", options: ["Червоне море", "Галілейське море", "Річка Йордан", "Мертве море"] },
+                { question: "Як звали першу пару, створену Богом?", answer: "Адам і Єва", options: ["Авраам і Сара", "Адам і Єва", "Ной та його дружина", "Ісак і Ревека"] },
+                { question: "Що Бог наказав Ною побудувати?", answer: "Ковчег", options: ["Храм", "Ковчег", "Вежу", "Стіну"] },
+                { question: "Який знак Бог дав Ною як обіцянку не знищувати землю водою?", answer: "Веселка", options: ["Голуб", "Веселка", "Зірка", "Вогонь"] },
+                { question: "Хто був молодим чоловіком, який переміг велетня Голіафа?", answer: "Давид", options: ["Самсон", "Давид", "Ісус Навин", "Гедеон"] },
+                { question: "Які продукти Ісус помножив у одному зі Своїх чудес?", answer: "Хліб і риба", options: ["Вино і виноград", "Хліб і риба", "Олія і борошно", "Вода і сіль"] },
+                { question: "Скільки учнів мав Ісус?", answer: "12", options: ["10", "12", "7", "3"] },
+                { question: "Яка перша книга Нового Заповіту?", answer: "Матвія", options: ["Марка", "Матвія", "Луки", "Дії"] },
+                { question: "У якій книзі Біблії написано: 'Господь — мій пастир, не матиму нестачі'?", answer: "Псалми", options: ["Приповісті", "Псалми", "Ісая", "Йов"] },
+                { question: "Яка остання книга Біблії?", answer: "Об'явлення", options: ["Дії", "Об'явлення", "Євреям", "Юда"] },
+                { question: "Якого пророка проковтнула велика риба?", answer: "Йона", options: ["Ілля", "Йона", "Ісая", "Єремія"] },
+                { question: "Хто зрадив Самсона?", answer: "Даліла", options: ["Рут", "Даліла", "Естер", "Вірсавія"] },
+                { question: "Де Мойсей вперше зустрів Бога?", answer: "Гора Хорив", options: ["Гора Сінай", "Гора Хорив", "Єрусалим", "Єгипет"] },
+                { question: "Яке чудо Ісус здійснив на весіллі в Кані?", answer: "Перетворив воду на вино", options: ["Зцілив сліпого", "Перетворив воду на вино", "Нагодував 5000", "Ходив по воді"] },
+                { question: "Якого пророка забрали на небо у вихорі?", answer: "Ілля", options: ["Єлисей", "Ілля", "Йона", "Ісая"] },
+                { question: "Хто побудував храм у Єрусалимі?", answer: "Соломон", options: ["Давид", "Соломон", "Саул", "Авраам"] },
+                { question: "Який апостол зрадив Ісуса?", answer: "Юда Іскаріот", options: ["Петро", "Юда Іскаріот", "Іван", "Тома"] },
+                { question: "Що сталося на горі Преображення?", answer: "Ісус преобразився", options: ["Ісус преобразився", "Десять Заповідей", "Весілля", "Хрещення"] },
+                { question: "Хто був пророком, що пішов до Ніневії?", answer: "Йона", options: ["Ісая", "Йона", "Єремія", "Даниїл"] },
+                { question: "Яка річка розділилася для ізраїльтян?", answer: "Йордан", options: ["Ніл", "Йордан", "Євфрат", "Тигр"] },
+                { question: "Хто був царицею, що врятувала свій народ?", answer: "Естер", options: ["Рут", "Естер", "Марія", "Сара"] },
+                { question: "Скільки днів Ісус постив у пустелі?", answer: "40", options: ["7", "40", "3", "12"] },
+                { question: "Хто написав більшість псалмів?", answer: "Давид", options: ["Соломон", "Давид", "Мойсей", "Павло"] },
+                { question: "Яке місто зруйнували труби?", answer: "Єрихон", options: ["Вавилон", "Єрихон", "Содом", "Гоморра"] },
+                { question: "Хто був сліпим, кого зцілив Ісус?", answer: "Вартимей", options: ["Лазар", "Вартимей", "Захей", "Павло"] },
+                { question: "Який птах приніс їжу Іллі?", answer: "Ворон", options: ["Голуб", "Ворон", "Орел", "Ластівка"] },
+                { question: "Хто був другом Давида?", answer: "Йонатан", options: ["Саул", "Йонатан", "Голіаф", "Авесалом"] },
+                { question: "Скільки заповідей дав Бог?", answer: "10", options: ["7", "10", "12", "5"] },
+                { question: "Хто воскрес Лазаря?", answer: "Ісус", options: ["Петро", "Ісус", "Павло", "Ілля"] },
+                { question: "Яке дерево прокляв Ісус?", answer: "Смоковниця", options: ["Олива", "Смоковниця", "Кедр", "Пальма"] },
+                { question: "Хто був у вогняній печі?", answer: "Шадрах, Мешах, Авед-Неґо", options: ["Даниїл", "Шадрах, Мешах, Авед-Неґо", "Йосип", "Мойсей"] },
+                { question: "Який день Бог освятив?", answer: "Сьомий", options: ["Перший", "Сьомий", "Четвертий", "Другий"] },
+                { question: "Хто хрестив у Йордані?", answer: "Іван Хреститель", options: ["Ісус", "Іван Хреститель", "Петро", "Павло"] },
+                { question: "Яке місто було збудовано Нимродом?", answer: "Вавилон", options: ["Єрихон", "Вавилон", "Назарет", "Вифлеєм"] },
+                { question: "Хто був батьком Ісака?", answer: "Авраам", options: ["Яків", "Авраам", "Ісак", "Йосип"] }
+            ],
+            medium: [
+                { question: "Що означає ім’я Адам (іврит 'adam')?", answer: "Земля, ґрунт", options: ["Людина", "Земля, ґрунт", "Червоний", "Створений"] },
+                { question: "Яка найдовша книга Біблії?", answer: "Єремія", options: ["Псалми", "Єремія", "Буття", "Ісая"] },
+                { question: "Хто з біблійних авторів написав понад тисячу пісень?", answer: "Соломон", options: ["Давид", "Соломон", "Мойсей", "Павло"] },
+                { question: "Які книги Біблії мають лише одну главу?", answer: "Овдій, Филимон, Юда, 2 Івана, 3 Івана", options: ["Овдій, Филимон, Юда, 2 Івана, 3 Івана", "Псалми, Приповісті", "Буття, Вихід", "Матвія, Марка"] },
+                { question: "Скільки разів слово 'християнин' згадується в Біблії?", answer: "3 рази", options: ["1 раз", "3 рази", "10 разів", "0 разів"] },
+                { question: "Яка книга Біблії відома як 'книга закону'?", answer: "Повторення Закону", options: ["Левит", "Повторення Закону", "Числа", "Вихід"] },
+                { question: "Хто була дружиною Авраама?", answer: "Сара", options: ["Ревека", "Сара", "Рахіль", "Лія"] },
+                { question: "Хто з апостолів Ісуса тричі відрікся від Нього перед розп’яттям?", answer: "Петро", options: ["Юда", "Петро", "Іван", "Тома"] },
+                { question: "Яка притча Ісуса розповідає про блудного сина?", answer: "Блудний син", options: ["Добрий самарянин", "Блудний син", "Сіяч", "Таланти"] },
+                { question: "Скільки розвідників було послано дослідити Обітовану Землю?", answer: "12", options: ["10", "12", "40", "7"] },
+                { question: "Волосся та попіл на голові були ознаками:", answer: "Покаяння і смирення", options: ["Радості", "Покаяння і смирення", "Багатства", "Війни"] },
+                { question: "Де написано: 'Навчи юнака зачатком дороги його, і він, як постаріється, не уступиться з неї'?", answer: "Приповісті 22:6", options: ["Псалми 23:1", "Приповісті 22:6", "Ісая 53:5", "Матвія 6:33"] },
+                { question: "Що таке 'манна'?", answer: "Хліб, що падав з неба для народу в пустелі", options: ["Фрукт", "Хліб, що падав з неба для народу в пустелі", "М’ясо", "Вода"] },
+                { question: "Хто такі Ілля та Єлисей?", answer: "Пророки за часів царів Ізраїлю", options: ["Царі", "Пророки за часів царів Ізраїлю", "Апостоли", "Судді"] },
+                { question: "Хто був наступником Давида як цар Ізраїлю?", answer: "Соломон", options: ["Саул", "Соломон", "Авесалом", "Реховоам"] },
+                { question: "Де знайшли Ісуса Його батьки, коли Йому було 12 років, після того, як Він загубився в Єрусалимі?", answer: "Сидів серед учителів у храмі, слухаючи та запитуючи", options: ["На ринку", "Сидів серед учителів у храмі, слухаючи та запитуючи", "Вдома", "У пустелі"] },
+                { question: "Яка книга Нового Заповіту вважається історичною?", answer: "Дії Апостолів", options: ["Римлянам", "Дії Апостолів", "Об’явлення", "Матвія"] },
+                { question: "Ісус сказав: 'Де твій скарб, там буде і...'?", answer: "Твоє серце", options: ["Твій розум", "Твоє серце", "Твоя душа", "Твоє багатство"] },
+                { question: "Яка книга Нового Заповіту містить список героїв віри?", answer: "Євреям", options: ["Галатам", "Євреям", "Ефесянам", "Якова"] },
+                { question: "Лише один із десяти прокажених повернувся подякувати Ісусу. З якого регіону він був?", answer: "Самарія", options: ["Галілея", "Самарія", "Юдея", "Єгипет"] },
+                { question: "Кому апостол Павло радив: 'Старайся поставити себе перед Богом гідним...'?", answer: "Тимофій", options: ["Тит", "Тимофій", "Филимон", "Варнава"] },
+                { question: "Хто наказав сонцю і місяцю зупинитися?", answer: "Ісус Навин", options: ["Мойсей", "Ісус Навин", "Давид", "Ілля"] },
+                { question: "За яке дерево славився Ліван?", answer: "Кедр", options: ["Олива", "Кедр", "Фіга", "Пальма"] },
+                { question: "Як помер Стефан?", answer: "Побитий камінням", options: ["Розп’ятий", "Побитий камінням", "Відсічена голова", "Спалений"] },
+                { question: "Де Ісуса взяли в полон?", answer: "Гефсиманія", options: ["Віфанія", "Гефсиманія", "Голгофа", "Назарет"] },
+                { question: "Яка книга розповідає про Давида і Голіафа?", answer: "1 Самуїла", options: ["1 Царів", "1 Самуїла", "Суддів", "2 Самуїла"] },
+                { question: "Де тюремник знайшов віру?", answer: "Филипи", options: ["Єрусалим", "Филипи", "Рим", "Коринф"] },
+                { question: "Як звали двох синів Заведея, одного з учнів?", answer: "Іван і Яків", options: ["Петро і Андрій", "Іван і Яків", "Матвій і Марко", "Филип і Варфоломій"] },
+                { question: "Яка книга розповідає про місіонерські подорожі Павла?", answer: "Дії Апостолів", options: ["Римлянам", "Дії Апостолів", "Галатам", "Ефесянам"] },
+                { question: "Як звали найстаршого сина Якова?", answer: "Рувим", options: ["Йосип", "Рувим", "Веніамін", "Левій"] },
+                { question: "Хто пророкував прихід Ісуса незадовго до Його народження?", answer: "Іван Хреститель", options: ["Ісая", "Іван Хреститель", "Малахія", "Єремія"] },
+                { question: "Як звали матір і бабусю Якова?", answer: "Ревека, Сара", options: ["Рахіль, Лія", "Ревека, Сара", "Рут, Наомі", "Марія, Єлизавета"] },
+                { question: "На якому тварині їздив Валаам?", answer: "Осел", options: ["Кінь", "Осел", "Верблюд", "Мул"] },
+                { question: "На яке дерево заліз Закхей?", answer: "Шовковиця", options: ["Олива", "Шовковиця", "Кедр", "Пальма"] },
+                { question: "Хто була першою матір’ю в Біблії?", answer: "Єва", options: ["Сара", "Єва", "Ревека", "Рахіль"] },
+                { question: "Скільки років було Сарі, коли народився Ісак?", answer: "90", options: ["100", "90", "80", "75"] },
+                { question: "Хто сказав сумні слова: 'Чи не краща я тобі за десятьох синів?'", answer: "Анна", options: ["Рут", "Анна", "Естер", "Наомі"] },
+                { question: "Хто була безплідною жінкою, яка молилася за сина і присвятила його Господу?", answer: "Анна", options: ["Сара", "Анна", "Єлизавета", "Рахіль"] },
+                { question: "Хто був пророком під час голоду в Ізраїлі?", answer: "Ілля", options: ["Єлисей", "Ілля", "Йона", "Амос"] },
+                { question: "Яка книга описує створення світу?", answer: "Буття", options: ["Вихід", "Буття", "Левит", "Числа"] },
+                { question: "Хто був батьком Йосипа?", answer: "Яків", options: ["Авраам", "Яків", "Ісак", "Йосип"] },
+                { question: "Скільки книг у Старому Заповіті?", answer: "39", options: ["27", "39", "66", "12"] },
+                { question: "Хто написав книгу Об'явлення?", answer: "Іван", options: ["Павло", "Іван", "Петро", "Лука"] },
+                { question: "Яка була перша кара на Єгипет?", answer: "Вода в кров", options: ["Жаби", "Вода в кров", "Сарана", "Темрява"] },
+                { question: "Хто був царем, що побудував флот?", answer: "Соломон", options: ["Давид", "Соломон", "Саул", "Реховоам"] },
+                { question: "Яка притча про доброго сусіда?", answer: "Добрий самарянин", options: ["Блудний син", "Добрий самарянин", "Сіяч", "Таланти"] },
+                { question: "Хто був у в'язниці з Йосипом?", answer: "Чашник і пекар", options: ["Фараон", "Чашник і пекар", "Брати", "Потіфар"] },
+                { question: "Скільки років Йосип був у Єгипті?", answer: "Більше 20", options: ["7", "Більше 20", "40", "13"] },
+                { question: "Хто був сестрою Мойсея?", answer: "Міріам", options: ["Рахіль", "Міріам", "Сара", "Лія"] },
+                { question: "Яка книга про мудрість?", answer: "Приповісті", options: ["Псалми", "Приповісті", "Йов", "Екклезіаст"] },
+                { question: "Хто був апостолом для язичників?", answer: "Павло", options: ["Петро", "Павло", "Іван", "Яків"] },
+                { question: "Яке місто відвідала Рут?", answer: "Вифлеєм", options: ["Єрусалим", "Вифлеєм", "Назарет", "Самарія"] },
+                { question: "Хто був чоловіком Рут?", answer: "Вооз", options: ["Наомі", "Вооз", "Орпа", "Іллімелех"] },
+                { question: "Скільки чудес Ісус здійснив у Кані?", answer: "1", options: ["2", "1", "3", "4"] },
+                { question: "Хто був учителем Павла?", answer: "Гамалиїл", options: ["Ісус", "Гамалиїл", "Петро", "Варнава"] },
+                { question: "Яка книга про страждання?", answer: "Йов", options: ["Псалми", "Йов", "Єремія", "Плач Єремії"] },
+                { question: "Хто був царем під час народження Ісуса?", answer: "Ірод", options: ["Понтій Пілат", "Ірод", "Август", "Тиберій"] },
+                { question: "Яке свято після воскресіння Ісуса?", answer: "П'ятидесятниця", options: ["Пасха", "П'ятидесятниця", "Різдво", "Вознесіння"] }
+            ],
+            expert: [
+                { question: "Хто з цих осіб не змінив ім’я в Біблії?", answer: "Давид", options: ["Сара", "Авраам", "Яків", "Давид"] },
+                { question: "Як звали найстаршу людину в Біблії та скільки їй було років?", answer: "Мафусал, 969 років", options: ["Ной, 950 років", "Мафусал, 969 років", "Адам", "Енош, 905 років"] },
+                { question: "Яке ім’я Мойсей мав сказати ізраїльтянам, коли вони запитали, хто його послав?", answer: "Я Той, Хто Є", options: ["Елогім", "Я Той, Хто Є", "Ель Шаддай", "Адонай"] },
+                { question: "Яка тварина говорила з Валаамом?", answer: "Осел", options: ["Змія", "Осел", "Голуб", "Лев"] },
+                { question: "Що не відповідає дійсності в історіях про Самуїла?", answer: "Він помазав трьох царів Ізраїлю: Йосипа, Саула і Давида", options: ["Його матір звали Анна", "Він помазав трьох царів Ізраїлю: Йосипа, Саула і Давида", "Він змінив пророка Ілія", "Він мав видіння в дуже молодому віці"] },
+                { question: "Як пастух, Давид захищав свою отару від двох небезпечних тварин. Яких саме?", answer: "Ведмідь і лев", options: ["Змія і вовк", "Ведмідь і лев", "Скорпіон і верблюд", "Вовк і лев"] },
+                { question: "Як немовля Мойсей був врятований від наказу фараона про вбивство?", answer: "Його поклали в кошик і пустили річкою", options: ["Його сховали в печері", "Його поклали в кошик і пустили річкою", "Його вивезли з Єгипту", "Його віддали до храму"] },
+                { question: "Скільки близьких учнів мав Ісус?", answer: "12", options: ["10", "12", "7", "3"] },
+                { question: "Доповніть вірш: 'Так бо Бог полюбив світ...'?", answer: "що дав Сина Свого Єдинородного, щоб кожен, хто вірує в Нього, не загинув, але мав життя вічне. Івана 3:16", options: ["що послав Сина Свого у світ, щоб світ спасся через Нього. Івана 6:16", "що дав Сина Свого Єдинородного, щоб кожен, хто вірує в Нього, не загинув, але мав життя вічне. Івана 3:16", "що ми називаємося Його дітьми, і ми справді є. 1 Івана 3:1", "що прийшов до своїх, але свої Його не прийняли. Івана 1:11"] },
+                { question: "На якому острові Іван написав книгу Об’явлення?", answer: "Острів Патмос", options: ["Острів Крит", "Острів Патмос", "Острів Мальта", "Острів Кіпр"] },
+                { question: "Що означає Ягве-Шамма?", answer: "Господь там", options: ["Господь забезпечує", "Господь там", "Господь зцілює", "Господь — мир"] },
+                { question: "Скільки хліба і риби було використано для нагодування 5000?", answer: "5 хлібів і 2 риби", options: ["7 хлібів і 3 риби", "5 хлібів і 2 риби", "4 хліба і 1 риба", "12 хлібів і 5 риб"] },
+                { question: "Як називається буряний вітер із чотирьох сторін землі?", answer: "Евроклідон", options: ["Темпест", "Евроклідон", "Тайфун", "Ураган"] },
+                { question: "Хто сказав: 'Проклятий Ханаан!'?", answer: "Ной", options: ["Авраам", "Ной", "Лот", "Ісак"] },
+                { question: "Скільки було Мойсею, коли його поклали в кошик?", answer: "3 місяці", options: ["40 днів", "3 місяці", "1 рік", "7 днів"] },
+                { question: "Хто був найстаршим братом серед 11 братів Йосипа?", answer: "Рувим", options: ["Симеон", "Рувим", "Юда", "Веніамін"] },
+                { question: "З якого дерева був зроблений ковчег Ноя?", answer: "Гоферове дерево", options: ["Кедрове дерево", "Гоферове дерево", "Оливкове дерево", "Акацієве дерево"] },
+                { question: "Який зріст мав Голіаф?", answer: "Шість ліктів і п’ядь", options: ["Дев’ять футів", "Шість ліктів і п’ядь", "Десять ліктів", "П’ять ліктів"] },
+                { question: "Хто повернув зір Павлу після того, як Господь його осліпив?", answer: "Ананія", options: ["Варнава", "Ананія", "Сила", "Петро"] },
+                { question: "Як Павло втік із Дамаска, коли юдеї намагалися його вбити?", answer: "Його спустили в кошику зі стін міста", options: ["Він бився і втік", "Його спустили в кошику зі стін міста", "Він переодягнувся", "Він переплив річку"] },
+                { question: "Де Павла побили камінням?", answer: "Лістра", options: ["Єрусалим", "Лістра", "Антіохія", "Коринф"] },
+                { question: "Що, за словами Павла, є виконанням закону?", answer: "Любов", options: ["Віра", "Любов", "Надія", "Послух"] },
+                { question: "Скільки всього дітей Ізраїлю спустилися до Єгипту?", answer: "70", options: ["40", "70", "12", "600"] },
+                { question: "Скільки часу діти Ізраїлю перебували в Єгипті?", answer: "215 років", options: ["400 років", "215 років", "430 років", "40 років"] },
+                { question: "На якій горі Ізраїль був проклятий за непослух?", answer: "Гора Евал", options: ["Гора Сінай", "Гора Евал", "Гора Кармель", "Гора Геризим"] },
+                { question: "Ким були відведені в полон діти Ізраїлю до Ассирії?", answer: "Салманасар", options: ["Навуходоносор", "Салманасар", "Кир", "Дарій"] },
+                { question: "Який був перший гріх Адама і Єви?", answer: "З'їли заборонений плід", options: ["Вбивство", "З'їли заборонений плід", "Крадіжка", "Брехня"] },
+                { question: "Хто був батьком Мафусала?", answer: "Енох", options: ["Адам", "Енох", "Ной", "Сет"] },
+                { question: "Скільки років будувався храм Соломона?", answer: "7", options: ["40", "7", "20", "3"] },
+                { question: "Яка книга містить 'Блаженства'?", answer: "Матвія 5", options: ["Луки 6", "Матвія 5", "Марка 4", "Івана 3"] },
+                { question: "Хто був пророком, що передбачив народження Ісуса?", answer: "Ісая", options: ["Єремія", "Ісая", "Даниїл", "Малахія"] },
+                { question: "Скільки глав у книзі Псалмів?", answer: "150", options: ["119", "150", "31", "66"] },
+                { question: "Хто був царем Ахашверошем у книзі Естер?", answer: "Ксеркс", options: ["Дарій", "Ксеркс", "Артаксеркс", "Кир"] },
+                { question: "Який апостол був на острові Патмос?", answer: "Іван", options: ["Павло", "Іван", "Петро", "Яків"] },
+                { question: "Хто був учителем Тимофія?", answer: "Павло", options: ["Петро", "Павло", "Іван", "Лука"] },
+                { question: "Скільки листів написав Павло?", answer: "13", options: ["4", "13", "7", "21"] },
+                { question: "Яка була друга кара на Єгипет?", answer: "Жаби", options: ["Вода в кров", "Жаби", "Комахи", "Град"] },
+                { question: "Хто був сином Давіда і Вірсавії?", answer: "Соломон", options: ["Авесалом", "Соломон", "Амнон", "Адонія"] },
+                { question: "Яка книга описує кінець світу?", answer: "Об'явлення", options: ["Даниїл", "Об'явлення", "Ісая", "Єзекиїл"] },
+                { question: "Хто був пророком у Вавилоні?", answer: "Даниїл", options: ["Ілля", "Даниїл", "Йона", "Амос"] },
+                { question: "Скільки днів був Йона в рибі?", answer: "3", options: ["40", "3", "7", "1"] },
+                { question: "Хто був царем під час будівництва стіни?", answer: "Неемія", options: ["Ездра", "Неемія", "Зоровавель", "Дарій"] },
+                { question: "Який вірш 'Золотий вірш'?", answer: "Івана 3:16", options: ["Римлянам 8:28", "Івана 3:16", "Псалом 23:1", "Матвія 6:33"] },
+                { question: "Хто був матір'ю Самуїла?", answer: "Анна", options: ["Сара", "Анна", "Єлизавета", "Рахіль"] },
+                { question: "Скільки племен Ізраїлю?", answer: "12", options: ["10", "12", "7", "40"] },
+                { question: "Хто був першим первосвящеником?", answer: "Аарон", options: ["Мойсей", "Аарон", "Йосип", "Левій"] }
+            ]
+        };
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const levels = document.querySelectorAll('.levels button');
+            const quizDiv = document.getElementById('quiz');
+            const questionEl = document.getElementById('question');
+            const optionsEl = document.getElementById('options');
+            const nextBtn = document.getElementById('next');
+            const resultEl = document.getElementById('result');
+            const resultText = document.getElementById('result-text');
+            const restartBtn = document.getElementById('restart');
+            const progressBar = document.getElementById('progress-bar');
+            const timerEl = document.getElementById('timer');
+            const levelsDiv = document.querySelector('.levels');
+
+            let currentQuestions = [];
+            let currentIndex = 0;
+            let score = 0;
+            let answered = false;
+            let timerInterval;
+            let timeLeft = 30;
+
+            const correctSound = new Audio('https://www.orangefreesounds.com/wp-content/uploads/2014/10/Correct-answer-sound-effect.mp3');
+            const incorrectSound = new Audio('https://www.orangefreesounds.com/wp-content/uploads/2014/08/Wrong-answer-sound-effect.mp3');
+
+            function resetGame() {
+                currentQuestions = [];
+                currentIndex = 0;
+                score = 0;
+                answered = false;
+                timeLeft = 30;
+                progressBar.style.width = '0%';
+                timerEl.textContent = timeLeft;
+                clearInterval(timerInterval);
+                quizDiv.classList.add('hidden');
+                resultEl.classList.add('hidden');
+                levelsDiv.classList.remove('hidden');
+            }
+
+            levels.forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const level = btn.id;
+                    currentQuestions = questions[level].sort(() => 0.5 - Math.random()); // Всі питання
+                    resetGame();
+                    levelsDiv.classList.add('hidden');
+                    quizDiv.classList.remove('hidden');
+                    loadQuestion();
+                });
+            });
+
+            restartBtn.addEventListener('click', resetGame);
+
+            function loadQuestion() {
+                if (currentIndex >= currentQuestions.length) {
+                    showResult();
+                    return;
+                }
+                answered = false;
+                timeLeft = 30;
+                timerEl.textContent = timeLeft;
+                startTimer();
+                const q = currentQuestions[currentIndex];
+                questionEl.textContent = q.question;
+                optionsEl.innerHTML = '';
+                q.options.forEach((opt, i) => {
+                    const div = document.createElement('div');
+                    div.classList.add('option');
+                    div.textContent = opt;
+                    div.addEventListener('click', () => {
+                        if (!answered) {
+                            clearInterval(timerInterval);
+                            checkAnswer(i, div);
+                        }
+                    });
+                    optionsEl.appendChild(div);
+                });
+                progressBar.style.width = ((currentIndex + 1) / currentQuestions.length * 100) + '%';
+                nextBtn.classList.add('hidden');
+            }
+
+            function startTimer() {
+                clearInterval(timerInterval);
+                timerInterval = setInterval(() => {
+                    timeLeft--;
+                    timerEl.textContent = timeLeft;
+                    if (timeLeft <= 0) {
+                        clearInterval(timerInterval);
+                        handleTimeout();
+                    }
+                }, 1000);
+            }
+
+            function handleTimeout() {
+                answered = true;
+                incorrectSound.play();
+                highlightCorrect();
+                setTimeout(() => {
+                    currentIndex++;
+                    loadQuestion();
+                }, 2000);
+            }
+
+            function checkAnswer(selected, div) {
+                answered = true;
+                const q = currentQuestions[currentIndex];
+                const options = optionsEl.querySelectorAll('.option');
+                options.forEach((opt, i) => {
+                    opt.style.pointerEvents = 'none';
+                    if (q.options[i] === q.answer) {
+                        opt.classList.add('correct');
+                    }
+                });
+                if (q.options[selected] === q.answer) {
+                    score++;
+                    correctSound.play();
+                    div.classList.add('correct');
+                    setTimeout(() => {
+                        currentIndex++;
+                        loadQuestion();
+                    }, 1000);
+                } else {
+                    incorrectSound.play();
+                    div.classList.add('incorrect');
+                    setTimeout(() => {
+                        currentIndex++;
+                        loadQuestion();
+                    }, 2000);
+                }
+            }
+
+            function highlightCorrect() {
+                const q = currentQuestions[currentIndex];
+                const options = optionsEl.querySelectorAll('.option');
+                options.forEach((opt, i) => {
+                    opt.style.pointerEvents = 'none';
+                    if (q.options[i] === q.answer) {
+                        opt.classList.add('correct');
+                    }
+                });
+            }
+
+            function showResult() {
+                quizDiv.classList.add('hidden');
+                resultEl.classList.remove('hidden');
+                resultText.textContent = `Ваш результат: ${score} з ${currentQuestions.length}`;
+                clearInterval(timerInterval);
+            }
+        });
+    </script>
+</body>
+</html>
+        h1 {
+            color: #ffffff;
+            text-shadow: 0 3px 6px rgba(0, 0, 0, 0.7);
+            font-size: 2.8em;
+            margin-bottom: 25px;
+        }
+
+        p {
+            color: #d0d0d0;
+            font-size: 1.3em;
+        }
+
+        .levels {
+            display: flex;
+            justify-content: space-around;
+            margin-bottom: 35px;
+        }
+
+        button {
+            background: rgba(80, 80, 80, 0.35);
+            border: none;
+            border-radius: 15px;
+            padding: 18px 35px;
+            color: #ffffff;
+            font-size: 1.2em;
+            cursor: pointer;
+            transition: all 0.4s ease;
+            backdrop-filter: blur(6px);
+            position: relative;
+            overflow: hidden;
+        }
+
+        button::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.25), transparent);
+            transition: 0.6s;
+        }
+
+        button:hover::before {
+            left: 100%;
+        }
+
+        button:hover {
+            background: rgba(120, 120, 120, 0.45);
+            transform: translateY(-4px);
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.4);
+        }
+
+        .quiz {
+            background: rgba(60, 60, 60, 0.25);
+            border-radius: 18px;
+            padding: 30px;
+            margin-top: 20px;
+            animation: slideIn 0.6s ease-in-out;
+        }
+
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateX(-30px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+
+        .progress {
+            background: rgba(0, 0, 0, 0.35);
+            border-radius: 12px;
+            height: 12px;
+            margin-bottom: 25px;
+            overflow: hidden;
+        }
+
+        #progress-bar {
+            background: linear-gradient(90deg, #00cc00, #66ff66);
+            height: 100%;
+            width: 0;
             transition: width 0.6s ease;
         }
 
