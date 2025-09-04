@@ -1,83 +1,144 @@
 body {
-    font-family: 'Arial', sans-serif;
-    background: url('https://source.unsplash.com/random/1920x1080/?bible') no-repeat center center fixed;
-    background-size: cover;
+    font-family: 'Roboto', sans-serif;
+    background: linear-gradient(135deg, #2b2b2b 0%, #1e1e1e 100%);
     display: flex;
     justify-content: center;
     align-items: center;
     height: 100vh;
     margin: 0;
-    color: #333;
+    color: #e0e0e0;
+    overflow: hidden;
 }
 
 .container {
-    background: rgba(255, 255, 255, 0.1);
-    backdrop-filter: blur(10px);
-    border-radius: 15px;
+    background: rgba(50, 50, 50, 0.2);
+    backdrop-filter: blur(12px);
+    border-radius: 20px;
     padding: 40px;
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.37);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
     text-align: center;
-    max-width: 600px;
+    max-width: 700px;
     width: 90%;
-    border: 1px solid rgba(255, 255, 255, 0.18);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    animation: fadeIn 1s ease-in-out;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(-20px); }
+    to { opacity: 1; transform: translateY(0); }
 }
 
 h1 {
-    color: #fff;
-    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+    color: #ffffff;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.6);
+    font-size: 2.5em;
+    margin-bottom: 20px;
 }
 
 p {
-    color: #eee;
+    color: #d0d0d0;
+    font-size: 1.2em;
 }
 
 .levels {
     display: flex;
     justify-content: space-around;
-    margin-bottom: 20px;
+    margin-bottom: 30px;
 }
 
 button {
-    background: rgba(255, 255, 255, 0.2);
+    background: rgba(80, 80, 80, 0.3);
     border: none;
-    border-radius: 10px;
+    border-radius: 12px;
     padding: 15px 30px;
-    color: #fff;
+    color: #ffffff;
+    font-size: 1.1em;
     cursor: pointer;
     transition: all 0.3s ease;
     backdrop-filter: blur(5px);
+    position: relative;
+    overflow: hidden;
+}
+
+button::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+    transition: 0.5s;
+}
+
+button:hover::before {
+    left: 100%;
 }
 
 button:hover {
-    background: rgba(255, 255, 255, 0.3);
-    transform: translateY(-2px);
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    background: rgba(100, 100, 100, 0.4);
+    transform: translateY(-3px);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
 }
 
 .quiz {
-    background: rgba(255, 255, 255, 0.15);
-    border-radius: 10px;
-    padding: 20px;
+    background: rgba(60, 60, 60, 0.2);
+    border-radius: 15px;
+    padding: 25px;
     margin-top: 20px;
+    animation: slideIn 0.5s ease-in-out;
+}
+
+@keyframes slideIn {
+    from { opacity: 0; transform: translateX(-20px); }
+    to { opacity: 1; transform: translateX(0); }
 }
 
 #question {
-    font-size: 1.2em;
-    margin-bottom: 15px;
-    color: #fff;
+    font-size: 1.3em;
+    margin-bottom: 20px;
+    color: #ffffff;
 }
 
 .option {
-    background: rgba(255, 255, 255, 0.1);
-    border-radius: 8px;
-    padding: 10px;
+    background: rgba(80, 80, 80, 0.3);
+    border-radius: 10px;
+    padding: 15px;
     margin: 10px 0;
+    color: #e0e0e0;
     cursor: pointer;
-    transition: background 0.3s;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
 }
 
 .option:hover {
-    background: rgba(255, 255, 255, 0.25);
+    background: rgba(100, 100, 100, 0.4);
+    transform: scale(1.02);
+}
+
+.option.correct {
+    background: rgba(0, 200, 0, 0.3);
+    border: 2px solid #00cc00;
+    animation: glowCorrect 0.5s ease;
+}
+
+.option.incorrect {
+    background: rgba(200, 0, 0, 0.3);
+    border: 2px solid #cc0000;
+    animation: glowIncorrect 0.5s ease;
+}
+
+@keyframes glowCorrect {
+    0% { box-shadow: 0 0 10px rgba(0, 200, 0, 0.5); }
+    50% { box-shadow: 0 0 20px rgba(0, 200, 0, 0.8); }
+    100% { box-shadow: 0 0 10px rgba(0, 200, 0, 0.5); }
+}
+
+@keyframes glowIncorrect {
+    0% { box-shadow: 0 0 10px rgba(200, 0, 0, 0.5); }
+    50% { box-shadow: 0 0 20px rgba(200, 0, 0, 0.8); }
+    100% { box-shadow: 0 0 10px rgba(200, 0, 0, 0.5); }
 }
 
 .hidden {
@@ -85,7 +146,12 @@ button:hover {
 }
 
 #result {
-    color: #fff;
-    font-size: 1.5em;
+    color: #ffffff;
+    font-size: 1.8em;
+    margin-top: 20px;
+    animation: fadeIn 1s ease-in-out;
+}
+
+#next {
     margin-top: 20px;
 }
