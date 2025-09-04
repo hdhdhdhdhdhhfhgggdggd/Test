@@ -9,6 +9,7 @@ document.addEventListener('DOMContentLoaded', () => {
     let currentQuestions = [];
     let currentIndex = 0;
     let score = 0;
+    let answered = false;
 
     levels.forEach(btn => {
         btn.addEventListener('click', () => {
@@ -25,6 +26,7 @@ document.addEventListener('DOMContentLoaded', () => {
             showResult();
             return;
         }
+        answered = false;
         const q = currentQuestions[currentIndex];
         questionEl.textContent = q.question;
         optionsEl.innerHTML = '';
@@ -32,21 +34,38 @@ document.addEventListener('DOMContentLoaded', () => {
             const div = document.createElement('div');
             div.classList.add('option');
             div.textContent = opt;
-            div.addEventListener('click', () => checkAnswer(i));
+            div.addEventListener('click', () => {
+                if (!answered) {
+                    checkAnswer(i, div);
+                }
+            });
             optionsEl.appendChild(div);
         });
+        nextBtn.classList.add('hidden');
     }
 
-    function checkAnswer(selected) {
+    function checkAnswer(selected, div) {
+        answered = true;
         const q = currentQuestions[currentIndex];
+        const options = optionsEl.querySelectorAll('.option');
+        options.forEach((opt, i) => {
+            opt.style.pointerEvents = 'none'; // Блокуємо вибір після відповіді
+            if (q.options[i] === q.answer) {
+                opt.classList.add('correct');
+            } else if (i === selected && q.options[i] !== q.answer) {
+                opt.classList.add('incorrect');
+            }
+        });
         if (q.options[selected] === q.answer) {
             score++;
         }
-        currentIndex++;
-        loadQuestion();
+        nextBtn.classList.remove('hidden');
     }
 
-    nextBtn.addEventListener('click', loadQuestion);
+    nextBtn.addEventListener('click', () => {
+        currentIndex++;
+        loadQuestion();
+    });
 
     function showResult() {
         quizDiv.classList.add('hidden');
