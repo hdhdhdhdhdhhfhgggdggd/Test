@@ -1,0 +1,91 @@
+body {
+    font-family: 'Arial', sans-serif;
+    background: url('https://source.unsplash.com/random/1920x1080/?bible') no-repeat center center fixed;
+    background-size: cover;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    margin: 0;
+    color: #333;
+}
+
+.container {
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(10px);
+    border-radius: 15px;
+    padding: 40px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.37);
+    text-align: center;
+    max-width: 600px;
+    width: 90%;
+    border: 1px solid rgba(255, 255, 255, 0.18);
+}
+
+h1 {
+    color: #fff;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+}
+
+p {
+    color: #eee;
+}
+
+.levels {
+    display: flex;
+    justify-content: space-around;
+    margin-bottom: 20px;
+}
+
+button {
+    background: rgba(255, 255, 255, 0.2);
+    border: none;
+    border-radius: 10px;
+    padding: 15px 30px;
+    color: #fff;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    backdrop-filter: blur(5px);
+}
+
+button:hover {
+    background: rgba(255, 255, 255, 0.3);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.quiz {
+    background: rgba(255, 255, 255, 0.15);
+    border-radius: 10px;
+    padding: 20px;
+    margin-top: 20px;
+}
+
+#question {
+    font-size: 1.2em;
+    margin-bottom: 15px;
+    color: #fff;
+}
+
+.option {
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 8px;
+    padding: 10px;
+    margin: 10px 0;
+    cursor: pointer;
+    transition: background 0.3s;
+}
+
+.option:hover {
+    background: rgba(255, 255, 255, 0.25);
+}
+
+.hidden {
+    display: none;
+}
+
+#result {
+    color: #fff;
+    font-size: 1.5em;
+    margin-top: 20px;
+}
