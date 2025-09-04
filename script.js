@@ -5,6 +5,8 @@ document.addEventListener('DOMContentLoaded', () => {
     const optionsEl = document.getElementById('options');
     const nextBtn = document.getElementById('next');
     const resultEl = document.getElementById('result');
+    const resultText = document.getElementById('result-text');
+    const restartBtn = document.getElementById('restart');
     const progressBar = document.getElementById('progress-bar');
     const timerEl = document.getElementById('timer');
 
@@ -21,11 +23,20 @@ document.addEventListener('DOMContentLoaded', () => {
     levels.forEach(btn => {
         btn.addEventListener('click', () => {
             const level = btn.id;
-            currentQuestions = questions[level].sort(() => 0.5 - Math.random()).slice(0, 10);
+            currentQuestions = questions[level].sort(() => 0.5 - Math.random()).slice(0, 20); // 20 випадкових питань
             document.querySelector('.levels').classList.add('hidden');
             quizDiv.classList.remove('hidden');
+            resultEl.classList.add('hidden');
+            currentIndex = 0;
+            score = 0;
             loadQuestion();
         });
+    });
+
+    restartBtn.addEventListener('click', () => {
+        document.querySelector('.levels').classList.remove('hidden');
+        resultEl.classList.add('hidden');
+        quizDiv.classList.add('hidden');
     });
 
     function loadQuestion() {
@@ -72,7 +83,8 @@ document.addEventListener('DOMContentLoaded', () => {
         incorrectSound.play();
         highlightCorrect();
         setTimeout(() => {
-            nextBtn.classList.remove('hidden');
+            currentIndex++;
+            loadQuestion();
         }, 2000);
     }
 
@@ -90,17 +102,37 @@ document.addEventListener('DOMContentLoaded', () => {
             score++;
             correctSound.play();
             div.classList.add('correct');
-            nextBtn.classList.remove('hidden');
+            setTimeout(() => {
+                currentIndex++;
+                loadQuestion();
+            }, 1000); // Автоматичний перехід після правильної відповіді
         } else {
             incorrectSound.play();
             div.classList.add('incorrect');
             setTimeout(() => {
-                nextBtn.classList.remove('hidden');
-            }, 2000); // Delay for incorrect
+                currentIndex++;
+                loadQuestion();
+            }, 2000); // Затримка для неправильної
         }
     }
 
     function highlightCorrect() {
+        const q = currentQuestions[currentIndex];
+        const options = optionsEl.querySelectorAll('.option');
+        options.forEach((opt, i) => {
+            opt.style.pointerEvents = 'none';
+            if (q.options[i] === q.answer) {
+                opt.classList.add('correct');
+            }
+        });
+    }
+
+    function showResult() {
+        quizDiv.classList.add('hidden');
+        resultEl.classList.remove('hidden');
+        resultText.textContent = `Ваш результат: ${score} з ${currentQuestions.length}`;
+    }
+});    function highlightCorrect() {
         const q = currentQuestions[currentIndex];
         const options = optionsEl.querySelectorAll('.option');
         options.forEach((opt, i) => {
