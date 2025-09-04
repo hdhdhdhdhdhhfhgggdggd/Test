@@ -94,6 +94,33 @@ button:hover {
     to { opacity: 1; transform: translateX(0); }
 }
 
+.progress {
+    background: rgba(0, 0, 0, 0.3);
+    border-radius: 10px;
+    height: 10px;
+    margin-bottom: 20px;
+    overflow: hidden;
+}
+
+#progress-bar {
+    background: linear-gradient(90deg, #00cc00, #66ff66);
+    height: 100%;
+    width: 0;
+    transition: width 0.5s ease;
+}
+
+#timer {
+    font-size: 1.5em;
+    color: #ffcc00;
+    margin-bottom: 15px;
+    animation: pulse 1s infinite alternate;
+}
+
+@keyframes pulse {
+    from { transform: scale(1); }
+    to { transform: scale(1.05); }
+}
+
 #question {
     font-size: 1.3em;
     margin-bottom: 20px;
@@ -120,13 +147,13 @@ button:hover {
 .option.correct {
     background: rgba(0, 200, 0, 0.3);
     border: 2px solid #00cc00;
-    animation: glowCorrect 0.5s ease;
+    animation: glowCorrect 1s ease;
 }
 
 .option.incorrect {
     background: rgba(200, 0, 0, 0.3);
     border: 2px solid #cc0000;
-    animation: glowIncorrect 0.5s ease;
+    animation: glowIncorrect 1s ease, shake 0.5s;
 }
 
 @keyframes glowCorrect {
@@ -139,6 +166,14 @@ button:hover {
     0% { box-shadow: 0 0 10px rgba(200, 0, 0, 0.5); }
     50% { box-shadow: 0 0 20px rgba(200, 0, 0, 0.8); }
     100% { box-shadow: 0 0 10px rgba(200, 0, 0, 0.5); }
+}
+
+@keyframes shake {
+    0% { transform: translateX(0); }
+    25% { transform: translateX(-5px); }
+    50% { transform: translateX(5px); }
+    75% { transform: translateX(-5px); }
+    100% { transform: translateX(0); }
 }
 
 .hidden {
@@ -154,4 +189,50 @@ button:hover {
 
 #next {
     margin-top: 20px;
+}
+
+/* Mobile adaptation */
+@media (max-width: 600px) {
+    .container {
+        padding: 20px;
+        max-width: 95%;
+    }
+
+    h1 {
+        font-size: 2em;
+    }
+
+    p {
+        font-size: 1em;
+    }
+
+    button {
+        padding: 10px 20px;
+        font-size: 1em;
+    }
+
+    .quiz {
+        padding: 15px;
+    }
+
+    #question {
+        font-size: 1.1em;
+    }
+
+    .option {
+        padding: 12px;
+        font-size: 0.9em;
+    }
+
+    #timer {
+        font-size: 1.2em;
+    }
+
+    .levels {
+        flex-direction: column;
+    }
+
+    .levels button {
+        margin-bottom: 10px;
+    }
 }
